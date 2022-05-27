@@ -40,7 +40,8 @@ public class Triangle {
   }
 
   public float area() {
-    return Math.sqrt(s * (s - a) * (s - b) * (s - c));
+    float temp = (s * (s - a) * (s - b) * (s - c));
+    return (float)Math.sqrt(temp);
   }
 
   public float perimeter() {
@@ -87,22 +88,30 @@ public class Triangle {
   public void printTrangle() {
     // takes points A as (0, 0)
     // and B as vertex (?, bases height)
-    if (typeOfTriangle.equals("right angle")) {
+    if (triangleType.equals("right angle")) {
       float[] vertex1 = {0f, 0f};
       float[] vertex2 = {0f, a};
       float[] vertex3 = {b, 0f};
 
-      for (int i = 0; i < a; i++) {
+      for (int i = 0; i < a + 2; i++) {
         if (i == 0) {
-          System.out.println("▇");
-        } else if (i == a - 1) {
-          System.out.print("▇");
+          System.out.println("&");
+        } else if (i == a + 1) {
+          System.out.print("&");
           for (int j = 0; j < b; j++) {
-            System.out.print("▬▬");
+            System.out.print("___");
           }
-          System.out.println("▇");
+          System.out.println("&");
+        } else {
+          System.out.print("|");
+          float totalDelayAmount = b * 3;
+          int howMuchDelayEachTime = Math.floor(totalDelayAmount / a);
+
+          for (int delay = 0; delay < i; delay++) {
+            System.out.print("   ");
+          }
+          System.out.println('\\');
         }
-        System.out.println("▌");
       }
 
     }
