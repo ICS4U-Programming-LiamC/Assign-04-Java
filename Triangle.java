@@ -48,6 +48,45 @@ public class Triangle {
     return (a + b + c);
   }
 
+  public float[] getAngles(float sideA, float sideB, float sideC) {
+    float[] angles = new float[3];
+    // returns angles from left to right, or I suppose bottom left, top, then right
+    // assumes that bottom is c, left is a, and right is b
+    angles[2] = 1 / (float)Math.cos((sideB * sideB + sideC * sideC - sideA * sideA) / (2 * sideB * sideC));
+    angles[0] = 1 / (float)Math.cos((sideA * sideA + sideC * sideC - sideB * sideB) / (2 * sideA * sideC));
+    angles[1] = 1 / (float)Math.cos((sideB * sideB + sideA * sideA - sideC * sideC) / (2 * sideB * sideA));
+    return angles;
+  }
+
+  public float[] longestSide() {
+    float[] returns = new float[3];
+    float biggest;
+    float newA;
+    float newB;
+    if (a > b && a > c) {
+      if (b < c) {
+        returns[0] = b; returns[1] = c; returns[2] = a;
+      } else {
+        returns[0] = c; returns[1] = b; returns[2] = a;
+      }
+
+    } else if (b > a && b > c) {
+      if (a < c) {
+        returns[0] = a; returns[1] = c; returns[2] = b;
+      } else {
+        returns[0] = c; returns[1] = a; returns[2] = b;
+      }
+
+    } else {
+      if (a < b) {
+        returns[0] = a; returns[1] = b; returns[2] = c;
+      } else {
+        returns[0] = b; returns[1] = a; returns[2] = c;
+      }
+    }
+    return returns;
+  }
+
   public String typeOfTriangle() {
     if (a == b && b == c) {
       return "equilateral";
@@ -85,6 +124,13 @@ public class Triangle {
     return (temp * 2 / b);
   }
 
+  public float height(float small, float small2, float hypo) {
+    // assuming b is the base
+    float temp = (s * (s - small) * (s - small2) * (s - hypo));
+    temp = (float)Math.sqrt(temp);
+    return (temp * 2 / hypo);
+  }
+
   public void printTrangle() {
     // takes points A as (0, 0)
     // and B as vertex (?, bases height)
@@ -105,17 +151,45 @@ public class Triangle {
         } else {
           System.out.print("|");
           float totalDelayAmount = b * 3;
-          int howMuchDelayEachTime = Math.floor(totalDelayAmount / a);
+          int howMuchDelayEachTime = (int)Math.floor(totalDelayAmount / a);
 
-          for (int delay = 0; delay < i; delay++) {
-            System.out.print("   ");
+          for (int delay = 0; delay < (howMuchDelayEachTime * i) - 3; delay++) {
+            System.out.print(" ");
           }
           System.out.println('\\');
         }
       }
 
+    } else {
+
+      float[] info = longestSide();
+      float aShort = info[0];
+      float bShort = info[1];
+      float hypo = info[2];
+      float h = height(aShort, bShort, hypo);
+      float x = (float)Math.sqrt((aShort * aShort) - (h * h));
+      int height = (int)h;
+      float[] angles = getAngles(aShort, bShort, hypo);
+
+      for (int i = 0; i <= height; i++) {
+        if (i == 0) {
+          for (int j = 0; j < x; j++) {
+            System.out.print("  ");
+          }
+          System.out.println("&");
+        } else if (i == height) {
+          System.out.print("&");
+          for (int j = 0; j < hypo; j++) {
+            System.out.print("__");
+          }
+          System.out.println("&");
+        } else {
+          System.out.println("");
+        }
+
+      }
+      
     }
 
   }
-
 }
