@@ -1,6 +1,5 @@
 import java.lang.Math;
 
-import javax.crypto.spec.IvParameterSpec;
 
 public class Triangle {
   double rToD = 180 / Math.PI;
@@ -19,10 +18,16 @@ public class Triangle {
     this.b = 4;
     this.c = 5;
     this.s = (a + b + c) / 2;
-    this.angles = getAngles(a, b, c);
-    this.angleA = angles[0] * rToD;
-    this.angleB = angles[1] * rToD;
-    this.angleC = angles[2] * rToD;
+    if (this.a == this.b && this.b == this.c) {
+      this.angleA = 60;
+      this.angleB = 60;
+      this.angleC = 60;
+    } else {
+      this.angles = getAngles(a, b, c);
+      this.angleA = angles[0] * rToD;
+      this.angleB = angles[1] * rToD;
+      this.angleC = angles[2] * rToD;
+    }
 
     valid = isValid();
     this.triangleType = typeOfTriangle();
@@ -36,25 +41,123 @@ public class Triangle {
     this.b = sides[1];
     this.c = sides[2];
     this.s = (a + b + c) / 2;
-    this.angles = getAngles(a, b, c);
-    this.angleA = angles[0] * rToD;
-    this.angleB = angles[1] * rToD;
-    this.angleC = angles[2] * rToD;
+    if (this.a == this.b && this.b == this.c) {
+      this.angleA = 60;
+      this.angleB = 60;
+      this.angleC = 60;
+    } else {
+      this.angles = getAngles(a, b, c);
+      this.angleA = angles[0] * rToD;
+      this.angleB = angles[1] * rToD;
+      this.angleC = angles[2] * rToD;
+    }
+
+    valid = isValid();
+    this.triangleType = typeOfTriangle();
+  }
+
+  public Triangle(double a, double b, double angle, String location) {
+    if (location.equals("a")) {
+      double tempSide = sAsCalculator(a, b, angle);
+      this.sides = longestSide(a, b, tempSide);
+    } else if (location.equals("b")) {
+      double tempAngle = sinLawAngle(b, angle, a);
+      if (Double.isNaN(tempAngle)) {
+        System.out.println("Your b length is not long enough to complete the triangle");
+        System.exit(1);
+      }
+      double otherAngle = 180 - tempAngle - angle;
+      double tempSide = sAsCalculator(a, b, otherAngle);
+      this.sides = longestSide(a, b, tempSide);
+    } else {
+      double tempAngle = sinLawAngle(a, angle, b);
+      if (Double.isNaN(tempAngle)) {
+        System.out.println("Your a length is not long enough to complete the triangle");
+        System.exit(1);
+      }
+      double otherAngle = 180 - tempAngle - angle;
+      double tempSide = sAsCalculator(b, a, otherAngle);
+      this.sides = longestSide(a, b, tempSide);
+    }
+
+    this.a = sides[0];
+    this.b = sides[1];
+    this.c = sides[2];
+    this.s = (a + b + c) / 2;
+    if (this.a == this.b && this.b == this.c) {
+      this.angleA = 60;
+      this.angleB = 60;
+      this.angleC = 60;
+    } else {
+      this.angles = getAngles(a, b, c);
+      this.angleA = angles[0] * rToD;
+      this.angleB = angles[1] * rToD;
+      this.angleC = angles[2] * rToD;
+    }
+
+    valid = isValid();
+    this.triangleType = typeOfTriangle();
+  }
+
+  public Triangle(double a, double angle1, double angle2, int missing) {
+    double otherAngle = 180 - angle1 - angle2;
+    double side2 = sinLawSide(a, otherAngle, angle1);
+    double side3 = sinLawSide(a, otherAngle, angle2);
+
+    this.sides = longestSide(a, side2, side3);
+
+    this.a = sides[0];
+    this.b = sides[1];
+    this.c = sides[2];
+    this.s = (a + b + c) / 2;
+    if (this.a == this.b && this.b == this.c) {
+      this.angleA = 60;
+      this.angleB = 60;
+      this.angleC = 60;
+    } else {
+      this.angles = getAngles(a, b, c);
+      this.angleA = angles[0] * rToD;
+      this.angleB = angles[1] * rToD;
+      this.angleC = angles[2] * rToD;
+    }
 
     valid = isValid();
     this.triangleType = typeOfTriangle();
   }
 
   private boolean isValid() {
-    if (a <= 0 && b <= 0 && c <= 0) {
-      if (a + b > c) {
-        return true;
-      } else {
-        return false;
-      }
+    boolean valid = true;
+    if (angleA + angleB + angleC > 180.0000001) {
+      System.out.println("The angles add up to more than 180, not a valid triangle");
+      valid = false;
+    }
+    if (a + b < c) {
+      System.out.println("The hypotenuse of the triangle is longer than the other sides combined");
+      valid = false;
+    }
+    if (a + b == c) {
+      System.out.println("The hypotenuse of the triangle is the same length as the other sides combined");
+      System.out.println("this is not a triangle but a line, therefore invalid");
+      valid = false;
+    }
+    if (valid == true) {
+      return true;
     } else {
+      System.exit(1);
       return false;
     }
+  }
+
+  private double sAsCalculator(double sideA, double sideB, double angle) {
+    return Math.sqrt(sideA * sideA + sideB * sideB - 2 * sideA * sideB * Math.cos(angle / 180 * Math.PI));
+  }
+
+  private double sinLawSide(double aSide, double aAngle, double bAngle) {
+    return Math.sin(bAngle / 180 * Math.PI) * (aSide / Math.sin(aAngle / 180 * Math.PI));
+  }
+  
+  private double sinLawAngle(double aSide, double aAngle, double bSide) {
+    return (Math.asin(bSide * Math.sin(aAngle / 180 * Math.PI) / aSide)) * 180 / Math.PI;
   }
 
   public double semiPerimeter() {
@@ -192,15 +295,15 @@ public class Triangle {
     return Math.sqrt((2 * sideB * sideB + 2 * sideC * sideC - sideA * sideA) / 4);
   }
 
-  public double inradius() {
+  private double inradius() {
     return area() / s;
   }
 
-  public double circumradius() {
+  private double circumradius() {
     return a / (2 * Math.sin(angleC / rToD));
   }
 
-  public double[] innerCircleCenter(double bottom, double angle1, double angle2) {
+  private double[] innerCircleCenter(double bottom, double angle1, double angle2) {
     double[] returns = new double[2];
     double angleC = 180 - angle1 - angle2;
     // takes half the angles of A and B and the side c and finds the vertex of that triangle
@@ -214,6 +317,33 @@ public class Triangle {
     returns[0] = dis;
     returns[1] = height;
     return returns;
+  }
+
+  private double[] collisionFinder(double pointAX, double pointAY, double mA, double pointBX, double pointBY, double mB) {
+    double[] collisionPoint = new double[2];
+    double bA = pointAY - mA * pointAX;
+    double bB = pointBY - mB * pointBX;
+    double x;
+    double y;
+
+    if (mA == Math.abs(Double.POSITIVE_INFINITY)) {
+      x = pointAX;
+    } else if (Math.abs(mB) == Double.POSITIVE_INFINITY) {
+      x = pointBX;
+    } else {
+      x = (bB - bA) / (mA - mB);
+    }
+    collisionPoint[0] = x;
+
+    if (Math.abs(mA) == Double.POSITIVE_INFINITY) {
+      y = mB * x + bB;
+    } else {
+      y = mA * x + bA;
+    }
+    collisionPoint[1] = y;
+
+    return collisionPoint;
+    
   }
 
   // finds the middle of the circumstribed circle. Made super easy because the second line is flat
@@ -231,16 +361,7 @@ public class Triangle {
     // gets the perpendicular slope at the midpoint of line 1, line two is flat so the perp is infinite
     double mA = (aX) / (aY) * -1;
 
-    // gets the b constant so that we have a full equation
-    double bA = midAY - mA * midAX;
-
-    // finds where those 2 lines intersect, this is the middle of the circle
-    double y = mA * x + bA;
-
-    returns[0] = x;
-    returns[1] = y;
-
-    return returns;
+    return collisionFinder(midAX, midAY, mA, x, 0, Double.POSITIVE_INFINITY);
   
   }
 
@@ -258,18 +379,68 @@ public class Triangle {
     return returns;
   }
 
-  public void printTrangle() {
+  public double altitude(double side) {
+    return 2 * area() / side;
+  }
+
+  private double[] changeFinder(double x1, double y1, double angle1, double x2, double y2, double angle2, boolean divide) { 
+    double[] change = new double[2];
+    double distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    double smallAngle1 = angle1 / 3;
+    double smallAngle2 = angle2 / 3;
+    double otherAngle = 180 - smallAngle1 - smallAngle2;
+
+    double lengthToVertex = distance * Math.sin(smallAngle2 / 180 * Math.PI) / Math.sin(otherAngle / 180 * Math.PI);
+    // double lengthToVertexFrom2 = distance * Math.sin(smallAngle1 / rToD) / Math.sin(otherAngle / rToD);
+
+    if (divide == true) {
+      change[0] = lengthToVertex * Math.cos(smallAngle1 * 2 / 180 * Math.PI);
+      change[1] = lengthToVertex * Math.sin(smallAngle1 * 2 / 180 * Math.PI);
+    } else {
+      change[0] = lengthToVertex * Math.cos(smallAngle1 / 180 * Math.PI);
+      change[1] = lengthToVertex * Math.sin(smallAngle1 / 180 * Math.PI);
+    }
+
+    return change;
+  }
+
+  public double[] morleysTrisector(double ax, double ay, double aAngle, double bx, double by, double bAngle, double cx, double cy, double cAngle) {
+    double[] vertecies = new double[6];
+
+    double[] changes = changeFinder(ax, ay, aAngle, bx, by, bAngle, true);
+
+    vertecies[0] = ax + changes[0];
+    vertecies[1] = ay + changes[1];
+
+    changes = changeFinder(bx, by, cAngle, cx, cy, bAngle, true);
+    vertecies[2] = cx - changes[0];
+    vertecies[3] = cy + changes[1];
+
+    changes = changeFinder(ax, ay, aAngle, cx, cy, cAngle, false);
+    vertecies[4] = ax + changes[0];
+    vertecies[5] = ay + changes[1];
+
+    return vertecies;
+  }
+
+  // removes all trailing zeros
+  public static String fmt(double d) {
+    if(d == (long) d) {
+      return Long.toString((long)d);
+    } else {
+      return Double.toString(d);
+    }
+  }
+
+  public void printTriangle() {
     // takes points A as (0, 0)
     // and B as vertex (?, bases height)
     double aShort = a;
     double bShort = b;
     double hypo = c;
-    double[] angles = getAngles(aShort, bShort, hypo);
-    double angleA = angles[0] * rToD;
-    double angleB = angles[1] * rToD;
-    double angleC = angles[2] * rToD;
     double h = aShort;
     double x = 0;
+    System.out.println("\n");
 
     //////////////////////// RIGHT ANGLE PRINTER //////////////////////////
     if (triangleType.equals("right angle")) {
@@ -436,19 +607,25 @@ public class Triangle {
     double[] innerCircCoord = innerCircleCenter(hypo, angleB / 2, angleA / 2);
     double[] outerCircCoord = outerCircleCenter(x, h, hypo);
     double[] orthocenter = orthocenter(x, h, hypo);
-    System.out.printf("Side a: %f, side b: %f, side c: %f\n", aShort, bShort, hypo);
-    System.out.printf("Angle A: %f*, angle B: %f*, angle C: %f*\n", angleA, angleB, angleC);
-    System.out.printf("Semiperimeter: %f, area: %f, perimeter: %f\n", s, area(), perimeter());
-    System.out.printf("Height a: %f, height b: %f, height c: %f\n", height(), height(bShort, aShort, hypo), height(hypo, bShort, aShort));
-    System.out.printf("Median a: %f, median b: %f, median c: %f\n", median(), median(bShort, aShort, hypo), median(hypo, bShort, aShort));
-    System.out.printf("Inradius: %f, circumradius: %f\n", inradius(), circumradius());
+    double[] morleysSideCoords = morleysTrisector(0, 0, angleB, x, h, angleC, hypo, 0, angleA);
+    double morleySideLen = Math.sqrt(Math.pow(morleysSideCoords[0] - morleysSideCoords[2], 2) + Math.pow(morleysSideCoords[1] - morleysSideCoords[3], 2));
+    double morleyArea = morleySideLen * morleySideLen / 2;
+    System.out.printf("\nSide a: %s, side b: %s, side c: %s\n", fmt(aShort), fmt(bShort), fmt(hypo));
+    System.out.printf("Angle A: %s*, angle B: %s*, angle C: %s*\n", fmt(angleA), fmt(angleB), fmt(angleC));
+    System.out.printf("Semiperimeter: %s, area: %s, perimeter: %s\n", fmt(s), fmt(area()), fmt(perimeter()));
+    System.out.printf("Height a: %s, height b: %s, height c: %s\n", fmt(height()), fmt(height(bShort, aShort, hypo)), fmt(height(hypo, bShort, aShort)));
+    System.out.printf("Median a: %s, median b: %s, median c: %s\n", fmt(median()), fmt(median(bShort, aShort, hypo)), fmt(median(hypo, bShort, aShort)));
+    System.out.printf("Inradius: %s, circumradius: %s\n", fmt(inradius()), fmt(circumradius()));
     if (triangleType.equals("right angle")) {
-      System.out.printf("Coords of C: (%d, %d), of B: (%f, %f), of A: (%f, %d)\n", 0, 0, x, h, hypo, 0);
+      System.out.printf("Coords of C: (0, 0), of B: (%s, 0), of A: (%s, 0)\n", fmt(x), fmt(h), fmt(hypo));
     } else {
-      System.out.printf("Coords of B: (%d, %d), of C: (%f, %f), of A: (%f, %d)\n", 0, 0, x, h, hypo, 0);
+      System.out.printf("Coords of B: (0, 0), of C: (%s, %s), of A: (%s, 0)\n", fmt(x), fmt(h), fmt(hypo));
     }
-    System.out.printf("Centroid: (%f, %f), inner circle center: (%f, %f), outer circle center: (%f, %f)\n", (x + hypo) / 3, h / 3, innerCircCoord[0], innerCircCoord[1], outerCircCoord[0], outerCircCoord[1]);
-    System.out.printf("Orthocenter: (%f, %f)\n", orthocenter[0], orthocenter[1]);
+    System.out.printf("Centroid: (%s, %s), inner circle center: (%s, %s), outer circle center: (%s, %s)\n", fmt((x + hypo) / 3), fmt(h / 3), fmt(innerCircCoord[0]), fmt(innerCircCoord[1]), fmt(outerCircCoord[0]), fmt(outerCircCoord[1]));
+    System.out.printf("Orthocenter: (%s, %s)\n", fmt(orthocenter[0]), fmt(orthocenter[1]));
+    System.out.printf("Altitude a: %s, b: %s, c: %s\n", fmt(altitude(aShort)), fmt(altitude(bShort)), fmt(altitude(hypo)));
+    System.out.printf("Morley's triangle vertecies: D: (%s, %s), E: (%s, %s), F: (%s, %s)\n", fmt(morleysSideCoords[0]), fmt(morleysSideCoords[1]), fmt(morleysSideCoords[4]), fmt(morleysSideCoords[5]), fmt(morleysSideCoords[2]), fmt(morleysSideCoords[3]));
+    System.out.printf("Morley's triangle side lengths: %s\n", fmt(morleySideLen));
+    System.out.printf("Morley's triangle area: %s, perimeter: %s, semiperimeter: %s\n", fmt(morleyArea), fmt(morleySideLen * 3), fmt(morleySideLen * 1.5));
   }
-
 }
