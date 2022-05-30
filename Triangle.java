@@ -1,5 +1,11 @@
 import java.lang.Math;
 
+/////////////// TO DO LIST ///////////////////////////////
+// clean up methods, many could use class parameters instead of passed variables
+// comment
+// header
+// test against online websites
+
 
 public class Triangle {
   double rToD = 180 / Math.PI;
@@ -155,7 +161,7 @@ public class Triangle {
   private double sinLawSide(double aSide, double aAngle, double bAngle) {
     return Math.sin(bAngle / 180 * Math.PI) * (aSide / Math.sin(aAngle / 180 * Math.PI));
   }
-  
+
   private double sinLawAngle(double aSide, double aAngle, double bSide) {
     return (Math.asin(bSide * Math.sin(aAngle / 180 * Math.PI) / aSide)) * 180 / Math.PI;
   }
