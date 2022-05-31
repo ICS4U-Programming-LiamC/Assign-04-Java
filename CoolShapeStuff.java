@@ -123,7 +123,7 @@ public class CoolShapeStuff {
         test.printTriangle();
       } else {
         System.out.println("You must input an angle for C");
-        while(true) {
+        while (true) {
           System.out.print("Input angle C: ");
           userInput = scan.nextLine();
           try {
