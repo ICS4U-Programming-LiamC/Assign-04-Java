@@ -1,5 +1,16 @@
 import java.lang.Math;
 
+
+/**
+ * Triangle.java is a program which gets a triangle from the CoolShapeStuff program
+ * It calculates various information and prints out the triangle visually
+ *
+ * @author Liam Csiffary
+ * @version 1.0
+ * @since 2022-06-01
+ */
+
+
 /////////////// TO DO LIST ///////////////////////////////
 // clean up methods, many could use class parameters instead of passed variables
 // comment
@@ -9,11 +20,11 @@ import java.lang.Math;
 
 public class Triangle {
   private final double RTOD = 180 / Math.PI;
-  double a, b, c, s;
+  double a, b, c, s, x, h;
   double angleA, angleB, angleC;
   String triangleType;
   double[] sides = new double[3];
-  double[] angles;
+  double[] angles = new double[3];
   boolean valid;
 
   // default triangle constuctor, makes a 3, 4, 5, right angle triangle.
@@ -38,6 +49,8 @@ public class Triangle {
 
     valid = isValid();
     this.triangleType = typeOfTriangle();
+    this.x = getX();
+    this.h = getH();
   }
 
   // triangle constuctor for 3 sides
@@ -67,6 +80,8 @@ public class Triangle {
     // check if triangle is valid
     valid = isValid();
     this.triangleType = typeOfTriangle();
+    this.x = getX();
+    this.h = getH();
   }
 
   // triangle constuctor for two sides and 1 angle, also needs the location of the angle.
@@ -121,6 +136,8 @@ public class Triangle {
     // check if valid and get the type of triangle
     valid = isValid();
     this.triangleType = typeOfTriangle();
+    this.x = getX();
+    this.h = getH();
   }
 
   // triangle contructor if 1 side and 2 angles, missing is no longer required but it 
@@ -151,7 +168,26 @@ public class Triangle {
 
     valid = isValid();
     this.triangleType = typeOfTriangle();
+    this.x = getX();
+    this.h = getH();
   }
+
+  private double getX() {
+    if (triangleType.equals("right angle")) {
+      return 0;
+    } else {
+      return Math.sqrt((a * a) - (h * h));
+    }
+  }
+
+  private double getH() {
+    if (triangleType.equals("right angle")) {
+      return a;
+    } else {
+      return height(c, a, b);
+    }
+  }
+
 
   private boolean isValid() {
     boolean valid = true;
@@ -383,32 +419,7 @@ public class Triangle {
     return returns;
   }
 
-  // finds the coordinates of th middle of the inner circle
-  private double[] innerCircleCenterRight() {
-
-    // gets half the angles of angle a and b
-    double angle1 = 45;
-    double angle2 = angleC / 2;
-    double[] returns = new double[2];
-    double angleG = 135 - angle2;
-
-    // takes half the angles of A and B and the side c and finds the vertex of that triangle
-    double leftSide = b * Math.sin(angle1 / RTOD) / Math.sin(angleG / RTOD);
-    double rightSide = b * Math.sin(angle2 / RTOD) / Math.sin(angleG / RTOD);
-  
-    // calculates the area of this triangle to get the height
-    double area = (leftSide * rightSide * Math.sin(angleG / RTOD)) / 2;
-    double height = 2 * area / b;
-  
-    // calculates the distance along the bottom of the triangle to the height line
-    double dis = height / Math.tan(angle1 / RTOD);
-
-    // returns the dis as x and height as y
-    returns[0] = dis;
-    returns[1] = height;
-    return returns;
-  }
-
+  // gets two lines and returns the coordinates of the collisionPoint of these two lines
   private double[] collisionFinder(double pointAX, double pointAY, double mA, double pointBX, double pointBY, double mB) {
     double[] collisionPoint = new double[2];
     double bA = pointAY - mA * pointAX;
@@ -433,55 +444,74 @@ public class Triangle {
     collisionPoint[1] = y;
 
     return collisionPoint;
-    
   }
 
   // finds the middle of the circumstribed circle. Made super easy because the second line is flat
   // this gives us the x coord instantly so all we need is an equation for the other line to find y
-  public double[] outerCircleCenter(double aX, double aY) {
+  public double[] outerCircleCenter() {
     double[] returns = new double[2];
     
     // gets the midpoint of line 1
-    double midAX = (0 + aX) / 2;
-    double midAY = (0 + aY) / 2;
+    double midAX = (0 + x) / 2;
+    double midAY = (0 + h) / 2;
 
     // line 2 is flat so the midpoint is just the length / 2
     double x = c / 2;
 
-    // gets the perpendicular slope at the midpoint of line 1, line two is flat so the perp is infinite
-    double mA = (aX) / (aY) * -1;
+    // gets the perpendicular slope at the midpoint of line 1
+    // line two is flat so the perpendicular line's slope is infinite
+    double mA = (x) / (h) * -1;
 
     return collisionFinder(midAX, midAY, mA, x, 0, Double.POSITIVE_INFINITY);
   
   }
 
-  public double[] orthocenter(double x, double y) {
+  // the orthocenter is the intersection of the perpendicular line to the
+  // height point of each line segment
+  // https://mathworld.wolfram.com/Orthocenter.html
+  public double[] orthocenter() {
     double[] returns = new double[2];
-    double m = (x) / (y) * -1;
+    // calculates the one of the two lines needed to find the intersection
+    double m = (x) / (h) * -1;
     double b = -1 * m * c;
 
+    // x is given since we already calculated it
     double coordX = x;
+
+    // calculate coord y with the created line and the given x
     double coordY = m * coordX + b;
 
     returns[0] = coordX;
-    returns[1] = coordY;
-
+    returns[1] = coordY; 
     return returns;
   }
 
+  // calculates the altitude of the given side
+  // its just the height calculated from the vertex instead of the 
+  // vertex calculated from the height
   public double altitude(double side) {
     return 2 * area() / side;
   }
 
-  private double[] changeFinder(double x1, double y1, double angle1, double x2, double y2, double angle2, boolean divide) { 
+  // calculates the change in coordinates of two points
+  private double[] changeFinder(
+      double x1, double y1, double angle1, double x2, double y2, double angle2, boolean divide) { 
     double[] change = new double[2];
+
+    // calculates the longest side of the smaller triangle
     double distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+
+    // 1 third of each angle to find the intersection of these angles anf the longest side
     double smallAngle1 = angle1 / 3;
     double smallAngle2 = angle2 / 3;
     double otherAngle = 180 - smallAngle1 - smallAngle2;
 
-    double lengthToVertex = distance * Math.sin(smallAngle2 / 180 * Math.PI) / Math.sin(otherAngle / 180 * Math.PI);
+    // gets the length from one vertex to the new vertex created 
+    double lengthToVertex = distance * Math.sin(
+        smallAngle2 / 180 * Math.PI) / Math.sin(otherAngle / 180 * Math.PI);
 
+    // calculates the x and y partitions of this length to vertex
+    // for the top vertex I need to multiply the angle by 2
     if (divide == true) {
       change[0] = lengthToVertex * Math.cos(smallAngle1 * 2 / 180 * Math.PI);
       change[1] = lengthToVertex * Math.sin(smallAngle1 * 2 / 180 * Math.PI);
@@ -493,29 +523,51 @@ public class Triangle {
     return change;
   }
 
-  public double[] morleysTrisector(double ax, double ay, double aAngle, double bx, double by, double bAngle, double cx, double cy, double cAngle) {
+  // calculates the vertecies of the morleys triangle
+  public double[] morleysTrisector(double aAngle, double bx, double by, double bAngle, double cx) {
     double[] vertecies = new double[6];
+    double cAngle = angleA;
 
-    double[] changes = changeFinder(ax, ay, aAngle, bx, by, bAngle, true);
+    // left vertice
+    double[] changes = changeFinder(0, 0, aAngle, bx, by, bAngle, true);
 
-    vertecies[0] = ax + changes[0];
-    vertecies[1] = ay + changes[1];
+    vertecies[0] = changes[0];
+    vertecies[1] = changes[1];
 
-    changes = changeFinder(bx, by, cAngle, cx, cy, bAngle, true);
+    // right vertice
+    changes = changeFinder(bx, by, cAngle, cx, 0, bAngle, true);
     vertecies[2] = cx - changes[0];
-    vertecies[3] = cy + changes[1];
+    vertecies[3] = changes[1];
 
-    changes = changeFinder(ax, ay, aAngle, cx, cy, cAngle, false);
-    vertecies[4] = ax + changes[0];
-    vertecies[5] = ay + changes[1];
+    // top vertecie
+    changes = changeFinder(0, 0, aAngle, cx, 0, cAngle, false);
+    vertecies[4] = changes[0];
+    vertecies[5] = changes[1];
 
     return vertecies;
   }
 
+  // https://mathworld.wolfram.com/deLongchampsPoint.html
+  private double[] deLongchampsPoint(double[] ortho, double[] circum) {
+    double[] longPoint = new double[2];
+    if (ortho[0] > circum[0]) {
+      longPoint[0] = ortho[0] - circum[0];
+    } else {
+      longPoint[0] = circum[0] - ortho[0];
+    }
+
+    if (ortho[1] > circum[1]) {
+      longPoint[1] = ortho[1] - circum[1];
+    } else {
+      longPoint[1] = circum[1] - ortho[1];
+    }
+    return longPoint;
+  }
+
   // removes all trailing zeros
   public static String fmt(double d) {
-    if(d == (long) d) {
-      return Long.toString((long)d);
+    if (d == (long) d) {
+      return Long.toString((long) d);
     } else {
       return Double.toString(d);
     }
@@ -524,10 +576,7 @@ public class Triangle {
   public void printTriangle() {
     // takes points A as (0, 0)
     // and B as vertex (?, bases height)
-    double aShort = a;
-    double bShort = b;
-    double hypo = c;
-    double h = aShort;
+    double h = a;
     double x = 0;
     System.out.println("\n");
 
@@ -697,12 +746,14 @@ public class Triangle {
     double[] innerCircCoord = innerCircleCenter();
     double inrad = inradius();
 
-    double[] outerCircCoord = outerCircleCenter(x, h);
-    double[] orthocenter = orthocenter(x, h);
+    double[] outerCircCoord = outerCircleCenter();
+    double[] orthocenter = orthocenter();
+    double[] longchampsPoint = deLongchampsPoint(orthocenter, outerCircCoord);
+
     if (triangleType.equals("right angle")) {
-      morleysSideCoords = morleysTrisector(0, 0, angleC, 0, a, angleB, b, 0, angleA);
+      morleysSideCoords = morleysTrisector(angleC, 0, a, angleB, b);
     } else {
-      morleysSideCoords = morleysTrisector(0, 0, angleB, x, h, angleC, c, 0, angleA);
+      morleysSideCoords = morleysTrisector(angleB, x, h, angleC, c);
     }
     double morleySideLen = Math.sqrt(Math.pow(morleysSideCoords[0] - morleysSideCoords[2], 2) + Math.pow(morleysSideCoords[1] - morleysSideCoords[3], 2));
     double morleyArea = morleySideLen * morleySideLen / 2;
@@ -726,5 +777,6 @@ public class Triangle {
     System.out.printf("Morley's triangle vertecies: D: (%s, %s), E: (%s, %s), F: (%s, %s)\n", fmt(morleysSideCoords[0]), fmt(morleysSideCoords[1]), fmt(morleysSideCoords[4]), fmt(morleysSideCoords[5]), fmt(morleysSideCoords[2]), fmt(morleysSideCoords[3]));
     System.out.printf("Morley's triangle side lengths: %s\n", fmt(morleySideLen));
     System.out.printf("Morley's triangle area: %s, perimeter: %s, semiperimeter: %s\n", fmt(morleyArea), fmt(morleySideLen * 3), fmt(morleySideLen * 1.5));
+    System.out.printf("The Longchamps Point is: (%s, %s)\n", fmt(longchampsPoint[0]), fmt(longchampsPoint[1]));
   }
 }
