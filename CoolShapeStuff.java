@@ -15,6 +15,10 @@ import java.util.Scanner;
 
 
 public class CoolShapeStuff {
+  /**
+   * Mosly just gets the information to create a triangle from the triangle
+   * class, then it calls the print function from the triangle class.
+   */
   public static void main(String[] args) {
 
     // disclaimers 
@@ -196,7 +200,7 @@ public class CoolShapeStuff {
       // gets the angle
       String inputedAngle;
       Double doubleOfAngle;
-      while(true) {
+      while (true) {
         System.out.print("Please input the angle: ");
         inputedAngle = scan.nextLine();
         try {
@@ -219,5 +223,6 @@ public class CoolShapeStuff {
       test = new Triangle(sideLengths.get(0), sideLengths.get(1), sideLengths.get(2));
       test.printTriangle();
     }
+    scan.close();
   }
 }

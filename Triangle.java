@@ -10,14 +10,6 @@ import java.lang.Math;
  * @since 2022-06-01
  */
 
-
-/////////////// TO DO LIST ///////////////////////////////
-// clean up methods, many could use class parameters instead of passed variables
-// comment
-// header
-// test against online websites
-
-
 public class Triangle {
   private final double RTOD = 180 / Math.PI;
   double a, b, c, s, x, h;
@@ -27,7 +19,9 @@ public class Triangle {
   double[] angles = new double[3];
   boolean valid;
 
-  // default triangle constuctor, makes a 3, 4, 5, right angle triangle.
+  /**
+   * default triangle constuctor, makes a 3, 4, 5, right angle triangle.
+   */
   public Triangle() {
     sides[0] = 3;
     sides[1] = 4;
@@ -36,16 +30,11 @@ public class Triangle {
     this.b = 4;
     this.c = 5;
     this.s = (a + b + c) / 2;
-    if (this.a == this.b && this.b == this.c) {
-      this.angleA = 60;
-      this.angleB = 60;
-      this.angleC = 60;
-    } else {
-      this.angles = getAngles();
-      this.angleA = angles[0] * RTOD;
-      this.angleB = angles[1] * RTOD;
-      this.angleC = angles[2] * RTOD;
-    }
+
+    this.angles = getAngles();
+    this.angleA = angles[0] * RTOD;
+    this.angleB = angles[1] * RTOD;
+    this.angleC = angles[2] * RTOD;
 
     valid = isValid();
     this.triangleType = typeOfTriangle();
@@ -53,7 +42,9 @@ public class Triangle {
     this.h = getH();
   }
 
-  // triangle constuctor for 3 sides
+  /**
+   * triangle constuctor for 3 sides.
+   */
   public Triangle(double a, double b, double c) {
 
     // organizes the sides
@@ -64,6 +55,8 @@ public class Triangle {
     // semiPerimeter
     this.s = (a + b + c) / 2;
     // if eqilateral set all angles to 60
+    // do this because trig and floating point errors would cause an equilateral
+    // triangle's angles to all be slightly less than 60*
     if (this.a == this.b && this.b == this.c) {
       this.angleA = 60;
       this.angleB = 60;
@@ -84,7 +77,9 @@ public class Triangle {
     this.h = getH();
   }
 
-  // triangle constuctor for two sides and 1 angle, also needs the location of the angle.
+  /**
+   * triangle constuctor for two sides and 1 angle, also needs the location of the angle. 
+   */
   public Triangle(double a, double b, double angle, String location) {
     double tempSide;
     // if angle is between the two sides
@@ -140,8 +135,10 @@ public class Triangle {
     this.h = getH();
   }
 
-  // triangle contructor if 1 side and 2 angles, missing is no longer required but it 
-  // now serves the purpose of differentiation betweem constructors. 
+  /**
+   * triangle contructor if 1 side and 2 angles, missing is no longer required but it 
+   * now serves the purpose of differentiation betweem constructors. 
+   */
   public Triangle(double a, double angle1, double angle2, int missing) {
     // get the last angle and calculate other sides with sine law
     double otherAngle = 180 - angle1 - angle2;
@@ -253,7 +250,9 @@ public class Triangle {
     return (a + b + c);
   }
 
-  // generates the angles of a triangle
+  /**
+   * generates the angles of a triangle.
+   */
   public double[] getAngles() {
     double[] angles = new double[3];
     // returns angles from left to right, or I suppose bottom left, top, then right
@@ -264,7 +263,9 @@ public class Triangle {
     return angles;
   }
 
-  // finds the longest side and returns a as smallest and c as largest
+  /**
+   * finds the longest side and returns a as smallest and c as largest.
+   */
   public double[] longestSide() {
     double[] returns = new double[3];
     if (a > b && a > c) {
@@ -303,7 +304,9 @@ public class Triangle {
     return returns;
   }
 
-  // longest side with specific inputs
+  /**
+   * longest side with specific inputs.
+   */
   public double[] longestSide(double sideA, double sideB, double sideC) {
     double[] returns = new double[3];
     if (sideA > sideB && sideA > sideC) {
@@ -342,7 +345,9 @@ public class Triangle {
     return returns;
   }
 
-  // gets the type of triangle
+  /**
+   * gets the type of triangle.
+   */
   public String typeOfTriangle() {
     if (a == b && b == c) {
       return "equilateral";
@@ -359,14 +364,18 @@ public class Triangle {
     }
   }
 
-  // default returns the height of a as base
+  /**
+   * default returns the height of a as base.
+   */
   public double height() {
     double temp = (s * (s - a) * (s - b) * (s - c));
     temp = Math.sqrt(temp);
     return (temp * 2 / a);
   }
 
-  // returns the first input as base
+  /**
+   * returns the first input as base.
+   */
   public double height(double sideA, double sideB, double sideC) {
     double temp = (s * (s - sideA) * (s - sideB) * (s - sideC));
     temp = Math.sqrt(temp);
@@ -419,8 +428,11 @@ public class Triangle {
     return returns;
   }
 
-  // gets two lines and returns the coordinates of the collisionPoint of these two lines
-  private double[] collisionFinder(double pointAX, double pointAY, double mA, double pointBX, double pointBY, double mB) {
+  /**
+   * gets two lines and returns the coordinates of the collisionPoint of these two lines.
+   */
+  private double[] collisionFinder(
+        double pointAX, double pointAY, double mA, double pointBX, double pointBY, double mB) {
     double[] collisionPoint = new double[2];
     double bA = pointAY - mA * pointAX;
     double bB = pointBY - mB * pointBX;
@@ -446,10 +458,11 @@ public class Triangle {
     return collisionPoint;
   }
 
-  // finds the middle of the circumstribed circle. Made super easy because the second line is flat
-  // this gives us the x coord instantly so all we need is an equation for the other line to find y
+  /**
+   * finds the middle of the circumstribed circle. Made super easy because the second line is flat
+   * this gives us the x coord instantly so all we need is an equation for the other line to find y
+   */
   public double[] outerCircleCenter() {
-    double[] returns = new double[2];
     
     // gets the midpoint of line 1
     double midAX = (0 + x) / 2;
@@ -466,9 +479,11 @@ public class Triangle {
   
   }
 
-  // the orthocenter is the intersection of the perpendicular line to the
-  // height point of each line segment
-  // https://mathworld.wolfram.com/Orthocenter.html
+  /**
+   * the orthocenter is the intersection of the perpendicular line to the
+   * height point of each line segment
+   * https://mathworld.wolfram.com/Orthocenter.html
+   */
   public double[] orthocenter() {
     double[] returns = new double[2];
     // calculates the one of the two lines needed to find the intersection
@@ -523,8 +538,10 @@ public class Triangle {
     return change;
   }
 
-  // calculates the vertecies of the morleys triangle
-  public double[] morleysTrisector(double aAngle, double bx, double by, double bAngle, double cx) {
+  /**
+   * calculates the vertecies of the morleys triangle.
+   */
+  private double[] morleysTrisector(double aAngle, double bx, double by, double bAngle, double cx) {
     double[] vertecies = new double[6];
     double cAngle = angleA;
 
@@ -564,8 +581,18 @@ public class Triangle {
     return longPoint;
   }
 
-  // removes all trailing zeros
-  public static String fmt(double d) {
+  private double[] ninePointCenter(double[] ortho, double[] circum) {
+    double[] ninePoint = new double[2];
+    ninePoint[0] = (ortho[0] + circum[0]) / 2;
+    ninePoint[1] = (ortho[1] + circum[1]) / 2;
+    
+    return ninePoint;
+  }
+
+  /**
+   * removes all trailing zeros.
+   */
+  private String fmt(double d) {
     if (d == (long) d) {
       return Long.toString((long) d);
     } else {
@@ -573,6 +600,9 @@ public class Triangle {
     }
   }
 
+  /**
+   * prints the triangle given by the user.
+   */
   public void printTriangle() {
     // takes points A as (0, 0)
     // and B as vertex (?, bases height)
@@ -613,7 +643,7 @@ public class Triangle {
           
           // how much to indent each part of the c line
           double totalDelayAmount = b * 2;
-          int howMuchDelayEachTime = (int)Math.floor(totalDelayAmount / a + 0.5);
+          int howMuchDelayEachTime = (int) Math.floor(totalDelayAmount / a + 0.5);
 
           // prints the spaces based on the delay
           for (int delay = 0; delay < (howMuchDelayEachTime * i) - 2; delay++) {
@@ -634,13 +664,10 @@ public class Triangle {
       h = height(c, a, b);
       x = Math.sqrt((a * a) - (h * h));
       int height = (int) h;
-      // gets the angles of the triangle
-      double timesIndented;
       double increment;
 
       // for each line in the height of the triangle
       for (int i = 0; i <= height; i++) {
-        timesIndented = 0;
         if (i == 0) {
           for (int j = 0; j < x; j++) {
             System.out.print("  ");
@@ -688,7 +715,6 @@ public class Triangle {
           // prints spaces x (the distance to point C) - i * increment
           for (int j = 0; j < (x - i * increment) * 2; j++) {
             System.out.print(" ");
-            timesIndented++;
           }
 
           // to be changed, will have different symbols depending on the angle
@@ -702,18 +728,21 @@ public class Triangle {
           } else {
             System.out.print("/");
           }
-          timesIndented++;
 
-
-          // prints a space i times increment old increment * 2 times this is to set the base indentation to x
+          // prints a space i times increment old increment
+          // * 2 times this is to set the base indentation to x
           for (int j = 0; j < (i * increment) * 2; j++) {
             System.out.print(" ");
           }
+
           if (i == 1) {
-            System.out.print(" "); // just to push the second slash out 1 more, lazy fix probably going to cause problems later.
+            // just to push the second slash out 1 more
+            // lazy fix probably going to cause problems later.
+            System.out.print(" ");
           } else if (i == 0) {
             System.out.print("  ");
           }
+          
           // for test purposes
           if (i == Math.floor(height / 2 + 0.5)) {
             System.out.print("h");
@@ -743,40 +772,70 @@ public class Triangle {
     }
     // prints the information of the triangle
     double[] morleysSideCoords = new double[6];
-    double[] innerCircCoord = innerCircleCenter();
-    double inrad = inradius();
+    final double[] innerCircCoord = innerCircleCenter();
+    final double inrad = inradius();
 
-    double[] outerCircCoord = outerCircleCenter();
-    double[] orthocenter = orthocenter();
-    double[] longchampsPoint = deLongchampsPoint(orthocenter, outerCircCoord);
+    final double[] outerCircCoord = outerCircleCenter();
+    final double[] orthocenter = orthocenter();
+    final double[] longchampsPoint = deLongchampsPoint(orthocenter, outerCircCoord);
+    final double[] ninePoint = ninePointCenter(orthocenter, outerCircCoord);
 
     if (triangleType.equals("right angle")) {
       morleysSideCoords = morleysTrisector(angleC, 0, a, angleB, b);
     } else {
       morleysSideCoords = morleysTrisector(angleB, x, h, angleC, c);
     }
-    double morleySideLen = Math.sqrt(Math.pow(morleysSideCoords[0] - morleysSideCoords[2], 2) + Math.pow(morleysSideCoords[1] - morleysSideCoords[3], 2));
-    double morleyArea = morleySideLen * morleySideLen / 2;
+    final double morleySideLen = Math.sqrt(
+        Math.pow(morleysSideCoords[0] - morleysSideCoords[2], 2)
+        + Math.pow(morleysSideCoords[1] - morleysSideCoords[3], 2));
+
+    final double morleyArea = morleySideLen * morleySideLen / 2;
+
     System.out.printf("\nSide a: %s, side b: %s, side c: %s\n", fmt(a), fmt(b), fmt(c));
-    System.out.printf("Angle A: %s*, angle B: %s*, angle C: %s*\n", fmt(angleA), fmt(angleB), fmt(angleC));
-    System.out.printf("Semiperimeter: %s, area: %s, perimeter: %s\n", fmt(s), fmt(area()), fmt(perimeter()));
-    System.out.printf("Height a: %s, height b: %s, height c: %s\n", fmt(height()), fmt(height(b, a, c)), fmt(height(c, b, a)));
-    System.out.printf("Median a: %s, median b: %s, median c: %s\n", fmt(median()), fmt(median(b, a, c)), fmt(median(c, b, a)));
+    System.out.printf("Angle A: %s*, angle B: %s*, angle C: %s*\n",
+        fmt(angleA), fmt(angleB), fmt(angleC));
+
+    System.out.printf("Semiperimeter: %s, area: %s, perimeter: %s\n",
+        fmt(s), fmt(area()), fmt(perimeter()));
+
+    System.out.printf("Height a: %s, height b: %s, height c: %s\n",
+        fmt(height()), fmt(height(b, a, c)), fmt(height(c, b, a)));
+
+    System.out.printf("Median a: %s, median b: %s, median c: %s\n",
+        fmt(median()), fmt(median(b, a, c)), fmt(median(c, b, a)));
+
     System.out.printf("Inradius: %s, circumradius: %s\n", fmt(inradius()), fmt(circumradius()));
+
+
     if (triangleType.equals("right angle")) {
-      System.out.printf("Coords of C: (0, 0), of B: (%s, 0), of A: (%s, 0)\n", fmt(x), fmt(h), fmt(c));
-      System.out.printf("Centroid: (%s, %s), inner circle center: (%s, %s), outer circle center: (%s, %s)\n", fmt(b / 3), fmt(h / 3), fmt(inrad), fmt(inrad), fmt(b / 2), fmt(a / 2));
+      System.out.printf("Coords of C: (0, 0), of B: (%s, 0), of A: (%s, 0)\n",
+          fmt(x), fmt(h), fmt(c));
+
+      System.out.printf("Centroid: (%s, %s), incenter: (%s, %s), circumcenter: (%s, %s)\n",
+          fmt(b / 3), fmt(h / 3), fmt(inrad), fmt(inrad), fmt(b / 2), fmt(a / 2));
     
     } else {
-      System.out.printf("Coords of B: (0, 0), of C: (%s, %s), of A: (%s, 0)\n", fmt(x), fmt(h), fmt(c));
-      System.out.printf("Centroid: (%s, %s), inner circle center: (%s, %s), outer circle center: (%s, %s)\n", fmt((x + c) / 3), fmt(h / 3), fmt(innerCircCoord[0]), fmt(innerCircCoord[1]), fmt(outerCircCoord[0]), fmt(outerCircCoord[1]));
-    
+      System.out.printf("Coords of B: (0, 0), of C: (%s, %s), of A: (%s, 0)\n",
+          fmt(x), fmt(h), fmt(c));
+      System.out.printf("Centroid: (%s, %s), incenter: (%s, %s), circumcenter: (%s, %s)\n",
+          fmt((x + c) / 3), fmt(h / 3), fmt(innerCircCoord[0]), fmt(innerCircCoord[1]),
+          fmt(outerCircCoord[0]), fmt(outerCircCoord[1]));
     }
+
     System.out.printf("Orthocenter: (%s, %s)\n", fmt(orthocenter[0]), fmt(orthocenter[1]));
-    System.out.printf("Altitude a: %s, b: %s, c: %s\n", fmt(altitude(a)), fmt(altitude(b)), fmt(altitude(c)));
-    System.out.printf("Morley's triangle vertecies: D: (%s, %s), E: (%s, %s), F: (%s, %s)\n", fmt(morleysSideCoords[0]), fmt(morleysSideCoords[1]), fmt(morleysSideCoords[4]), fmt(morleysSideCoords[5]), fmt(morleysSideCoords[2]), fmt(morleysSideCoords[3]));
+    System.out.printf("Altitude a: %s, b: %s, c: %s\n",
+        fmt(altitude(a)), fmt(altitude(b)), fmt(altitude(c)));
+
+    System.out.printf("Morley's triangle vertecies: D: (%s, %s), E: (%s, %s), F: (%s, %s)\n",
+        fmt(morleysSideCoords[0]), fmt(morleysSideCoords[1]),
+        fmt(morleysSideCoords[4]), fmt(morleysSideCoords[5]),
+        fmt(morleysSideCoords[2]), fmt(morleysSideCoords[3]));
+
     System.out.printf("Morley's triangle side lengths: %s\n", fmt(morleySideLen));
-    System.out.printf("Morley's triangle area: %s, perimeter: %s, semiperimeter: %s\n", fmt(morleyArea), fmt(morleySideLen * 3), fmt(morleySideLen * 1.5));
-    System.out.printf("The Longchamps Point is: (%s, %s)\n", fmt(longchampsPoint[0]), fmt(longchampsPoint[1]));
+    System.out.printf("Morley's triangle area: %s, perimeter: %s, semiperimeter: %s\n",
+        fmt(morleyArea), fmt(morleySideLen * 3), fmt(morleySideLen * 1.5));
+
+    System.out.printf("The Longchamps Point is: (%s, %s), the nine point center is (%s, %s)\n",
+        fmt(longchampsPoint[0]), fmt(longchampsPoint[1]), fmt(ninePoint[0]), fmt(ninePoint[1]));
   }
 }
