@@ -154,6 +154,7 @@ public class CoolShapeStuff {
         angles.add(180 - angles.get(0) - angles.get(1));
         test = new Triangle(sideLengths.get(0), angles.get(0), angles.get(1), 0);
         test.printTriangle();
+        System.exit(0);
       } else {
         System.out.println("You must input an angle for C");
         while (true) {
@@ -169,7 +170,7 @@ public class CoolShapeStuff {
               test = new Triangle(
                   sideLengths.get(0), angles.get(0), (180 - angles.get(0) - angles.get(1)));
               test.printTriangle();
-              break;
+              System.exit(0);
             } else {
               System.out.println("Please input a positive number for the angle");
             }
@@ -211,6 +212,7 @@ public class CoolShapeStuff {
             // depending on where the angle is send the arguments to the constructor
             test = new Triangle(sideLengths.get(0), sideLengths.get(1), doubleOfAngle, userInput);
             test.printTriangle();
+            System.exit(0);
           }
         } catch (NumberFormatException e) {
           System.out.println("You must input a positive non-zero number");
@@ -222,6 +224,7 @@ public class CoolShapeStuff {
       System.out.println("No need for any angles!");
       test = new Triangle(sideLengths.get(0), sideLengths.get(1), sideLengths.get(2));
       test.printTriangle();
+      System.exit(0);
     }
     scan.close();
   }

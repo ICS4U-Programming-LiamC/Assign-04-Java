@@ -38,8 +38,8 @@ public class Triangle {
 
     valid = isValid();
     this.triangleType = typeOfTriangle();
-    this.x = getX();
     this.h = getH();
+    this.x = getX();
   }
 
   /**
@@ -73,8 +73,8 @@ public class Triangle {
     // check if triangle is valid
     valid = isValid();
     this.triangleType = typeOfTriangle();
-    this.x = getX();
     this.h = getH();
+    this.x = getX();
   }
 
   /**
@@ -131,8 +131,8 @@ public class Triangle {
     // check if valid and get the type of triangle
     valid = isValid();
     this.triangleType = typeOfTriangle();
-    this.x = getX();
     this.h = getH();
+    this.x = getX();
   }
 
   /**
@@ -165,8 +165,8 @@ public class Triangle {
 
     valid = isValid();
     this.triangleType = typeOfTriangle();
-    this.x = getX();
     this.h = getH();
+    this.x = getX();
   }
 
   private double getX() {
@@ -214,6 +214,7 @@ public class Triangle {
       return true;
     } else {
       System.exit(1);
+      // to stop stylechecking errors
       return false;
     }
   }
@@ -365,6 +366,36 @@ public class Triangle {
   }
 
   /**
+   * Determines whether the triangle is scalene or not.
+   */
+  public String scalene() {
+    if (triangleType.equals("scalene")) {
+      return "";
+    } else {
+      if (angleA != angleB && angleB != angleC && angleA != angleC) {
+        return "scalene";
+      } else {
+        return "";
+      }
+    }
+  }
+
+  /**
+   * Determines whether the triangle is scalene or not.
+   */
+  public String obtuse() {
+    if (triangleType.equals("right angle") || triangleType.equals("equilateral")) {
+      return "";
+    } else {
+      if (angleA > 90 || angleB > 90 || angleC > 90) {
+        return "obtuse";
+      } else {
+        return "acute";
+      }
+    }
+  }
+
+  /**
    * default returns the height of a as base.
    */
   public double height() {
@@ -399,11 +430,12 @@ public class Triangle {
 
   // generates the radius of the outer circle
   public double circumradius() {
-    return a / (2 * Math.sin(angleC / RTOD));
+    // return a / (2 * Math.sin(angleC * 180 / Math.PI));
+    return (a * b * c) / Math.sqrt((a + b + c) * (b + c - a) * (c + a - b) * (a + b - c));
   }
 
   // finds the coordinates of th middle of the inner circle
-  private double[] innerCircleCenter() {
+  public double[] innerCircleCenter() {
 
     // gets half the angles of angle a and b
     double angle1 = angleB / 2;
@@ -429,53 +461,28 @@ public class Triangle {
   }
 
   /**
-   * gets two lines and returns the coordinates of the collisionPoint of these two lines.
-   */
-  private double[] collisionFinder(
-        double pointAX, double pointAY, double mA, double pointBX, double pointBY, double mB) {
-    double[] collisionPoint = new double[2];
-    double bA = pointAY - mA * pointAX;
-    double bB = pointBY - mB * pointBX;
-    double x;
-    double y;
-
-    if (mA == Math.abs(Double.POSITIVE_INFINITY)) {
-      x = pointAX;
-    } else if (Math.abs(mB) == Double.POSITIVE_INFINITY) {
-      x = pointBX;
-    } else {
-      x = (bB - bA) / (mA - mB);
-    }
-    collisionPoint[0] = x;
-
-    if (Math.abs(mA) == Double.POSITIVE_INFINITY) {
-      y = mB * x + bB;
-    } else {
-      y = mA * x + bA;
-    }
-    collisionPoint[1] = y;
-
-    return collisionPoint;
-  }
-
-  /**
    * finds the middle of the circumstribed circle. Made super easy because the second line is flat
    * this gives us the x coord instantly so all we need is an equation for the other line to find y
    */
   public double[] outerCircleCenter() {
-    
+    double[] coords = new double[2];
+
     // gets the midpoint of line 1
-    double midAX = (0 + x) / 2;
-    double midAY = (0 + h) / 2;
+    double midAX = x / 2;
+    double midAY = h / 2;
 
     // line 2 is flat so the midpoint is just the length / 2
-    double x = c / 2;
+    double midpoint = c / 2;
 
     // gets the perpendicular slope at the midpoint of line 1
     // line two is flat so the perpendicular line's slope is infinite
-    double mA = (x) / (h) * -1;
+    double mA = -1 / (h / x);
+    double b = midAY - (midAX * mA);
+    
+    coords[0] = midpoint;
+    coords[1] = mA * midpoint + b;
 
-    return collisionFinder(midAX, midAY, mA, x, 0, Double.POSITIVE_INFINITY);
+    return coords;
   
   }
 
@@ -606,13 +613,10 @@ public class Triangle {
   public void printTriangle() {
     // takes points A as (0, 0)
     // and B as vertex (?, bases height)
-    double h = a;
-    double x = 0;
     System.out.println("\n");
 
     //////////////////////// RIGHT ANGLE PRINTER //////////////////////////
     if (triangleType.equals("right angle")) {
-
       // for each in height, which is side a, +2 to fit B and the &'s
       for (int i = 0; i < a + 2; i++) {
         // for the top
@@ -661,8 +665,6 @@ public class Triangle {
       ////////////////////// EVERYTHING ELSE PRINTER ///////////////////////
     } else {
       // gets the height and the distance along line the hypotenuse to the base of the height
-      h = height(c, a, b);
-      x = Math.sqrt((a * a) - (h * h));
       int height = (int) h;
       double increment;
 
@@ -798,6 +800,8 @@ public class Triangle {
     System.out.printf("Semiperimeter: %s, area: %s, perimeter: %s\n",
         fmt(s), fmt(area()), fmt(perimeter()));
 
+    System.out.printf("Type of triangle %s %s %s\n\n", obtuse(), triangleType, scalene());
+
     System.out.printf("Height a: %s, height b: %s, height c: %s\n",
         fmt(height()), fmt(height(b, a, c)), fmt(height(c, b, a)));
 
@@ -817,16 +821,18 @@ public class Triangle {
     } else {
       System.out.printf("Coords of B: (0, 0), of C: (%s, %s), of A: (%s, 0)\n",
           fmt(x), fmt(h), fmt(c));
-      System.out.printf("Centroid: (%s, %s), incenter: (%s, %s), circumcenter: (%s, %s)\n",
-          fmt((x + c) / 3), fmt(h / 3), fmt(innerCircCoord[0]), fmt(innerCircCoord[1]),
+      System.out.printf("Incenter: (%s, %s), circumcenter: (%s, %s)\n",
+          fmt(innerCircCoord[0]), fmt(innerCircCoord[1]),
           fmt(outerCircCoord[0]), fmt(outerCircCoord[1]));
     }
 
-    System.out.printf("Orthocenter: (%s, %s)\n", fmt(orthocenter[0]), fmt(orthocenter[1]));
+    System.out.printf("Centroid: (%s, %s), Orthocenter: (%s, %s)\n",
+        fmt((x + c) / 3), fmt(h / 3), fmt(orthocenter[0]), fmt(orthocenter[1]));
+
     System.out.printf("Altitude a: %s, b: %s, c: %s\n",
         fmt(altitude(a)), fmt(altitude(b)), fmt(altitude(c)));
 
-    System.out.printf("Morley's triangle vertecies: D: (%s, %s), E: (%s, %s), F: (%s, %s)\n",
+    System.out.printf("Morley's triangle vertecies: \n D: (%s, %s)\n E: (%s, %s)\n F: (%s, %s)\n",
         fmt(morleysSideCoords[0]), fmt(morleysSideCoords[1]),
         fmt(morleysSideCoords[4]), fmt(morleysSideCoords[5]),
         fmt(morleysSideCoords[2]), fmt(morleysSideCoords[3]));
